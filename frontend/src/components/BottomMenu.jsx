@@ -1,34 +1,37 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
-const BottomMenu = () => {
+const BottomMenu = ({isSlidingPanelOpen}) => {
   const [userQuery, setUserQuery] = useState("");
   const navigate = useNavigate();
+  
+  useEffect(()=>{
+    if(!isSlidingPanelOpen) {
+      setUserQuery("");
+    }
+  }, [isSlidingPanelOpen]);
 
   const handleInputChange = (e) => {
     setUserQuery(e.target.value);
   };
 
   const handleQuerySubmit = async () => {
-      try {
-        const response = await axios.get("http://localhost:3001/categories");
-        const categories = response.data;
-        for (const category of categories) {
-          if (userQuery.toLowerCase().includes(category.toLowerCase())) {
-            navigate("/mentors", { state: { category: category } });
-          }
+    try {
+      let skill = userQuery.toLowerCase();
+      navigate("/mentors", {
+        state: {
+          skill: skill
         }
-      } catch (error) {
-        console.error("Error fetching categories:", error);
-      }
-      
+      });
+    } catch (error) {
+      console.error("Error fetching skills:", error);
+    }
   };
 
   return (
     <div className="absolute bottom-0 left-0 right-0 bg-gray-300 p-4 m-4 rounded max-h-[600px] overflow-y-auto">
       <h3 className="text-lg font-bold mb-2 text-center">
-        Hi! I'm AVA! I am here to find you a mentor! Please type in your issues below, and I can fetch you a mentor.
+      Hi Bhuvan Kumar, Hope you are doing great today! I am Luna, your AI assistant, Do you want me to search for a mentor?
       </h3>
 
       <div className="flex flex-col items-center">

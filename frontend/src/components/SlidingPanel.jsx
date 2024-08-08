@@ -25,7 +25,7 @@ const SlidingPanel = () => {
           <h2 className="text-2xl text-custom-brown font-bold mb-4 text-center">MentorLink Finder</h2>
         </div>
 
-        <BottomMenu />
+        <BottomMenu isSlidingPanelOpen={isSlidingPanelOpen}/>
       </div>
     </>
   );

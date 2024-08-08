@@ -9,8 +9,11 @@ const DisplayMentors = () => {
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    if (state?.category) {
-      const apiUrl = `http://localhost:3001/users/${state.category}`;
+    const skill = state?.skill;
+    if (skill) {
+      // Log the skill for debugging purposes
+      // Assuming an endpoint exists at /mentors/skill/:skillName
+      const apiUrl = `http://localhost:3001/users/skills/${skill}`; // Adjusted to use skill
       fetch(apiUrl)
         .then((response) => {
           if (!response.ok) {
@@ -28,7 +31,7 @@ const DisplayMentors = () => {
           setLoading(false);
         });
     }
-  }, [state?.category]);
+  }, [state?.skills]); // Changed dependency to state.skills
 
   if (loading) {
     return <div className="text-center">Loading...</div>;
@@ -40,7 +43,7 @@ const DisplayMentors = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Available Mentors in {state?.category}</h1>
+      <h1 className="text-2xl font-bold mb-4">Available Mentors in {state?.skills}</h1> {/* Updated to display skill */}
       <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
         {mentors.map((mentor, index) => (
           <div
@@ -55,7 +58,7 @@ const DisplayMentors = () => {
             <h2 className="text-lg font-semibold mb-2">
               {mentor.fname} {mentor.lname}
             </h2>
-            <p className="text-gray-600 mb-4">{mentor.category}</p>
+            <p className="text-gray-600 mb-4">{mentor.skills.join(', ')}</p> {/* Assuming skills is an array */}
             <button
               className="bg-blue-500 text-white py-2 px-4 rounded"
               onClick={() => window.location.href = `https://mentorlink.in/#/categories/${mentor.category}`}

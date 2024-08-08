@@ -80,6 +80,26 @@ app.get("/categories", async (req, res) => {
   }
 });
 
+app.get("/skills", async (req, res) => {
+  try {
+    // Use the User model to aggregate skills
+    const skillsAggregationResult = await User.aggregate([
+      { $unwind: "$skills" }, // Unwind the skills array to deconstruct each skill into a document
+      { $group: { _id: null, allSkills: { $addToSet: "$skills" } } }, // Group all skills into a single array, ensuring uniqueness
+      { $project: { _id: 0, allSkills: 1 } } // Project only the skills array, excluding the _id field
+    ]);
+
+    // Extract the skills array from the aggregation result
+    const skills = skillsAggregationResult[0]?.allSkills || [];
+
+    // Return the skills array as JSON
+    return res.json(skills);
+  } catch (err) {
+    console.error("Error fetching skills:", err); // Log the error for debugging
+    return res.status(500).send("Error fetching skills"); // Send a generic error message to the client
+  }
+});
+
 app.get("/:category/skills", async (req, res) => {
   const { category } = req.params;
   try {
@@ -100,14 +120,33 @@ app.get("/:category/skills", async (req, res) => {
   }
 });
 
-app.get("/users/:category", async (req, res) => {
-  const { category } = req.params;
+// app.get("/users/:category", async (req, res) => {
+//   const { category } = req.params;
+//   try {
+//     const users = await User.find({ category : category , mentor: true })
+//       .select(
+//         "fname lname mentor profileImage category skills subCategory -_id"
+//       )
+//       .exec();
+//     res.json(users);
+//   } catch (err) {
+//     res.status(500).send("Error fetching users");
+//   }
+// });
+
+app.get("/users/skills/:skill", async (req, res) => {
+  const { skill } = req.params;
   try {
-    const users = await User.find({ category : category , mentor: true })
+    const users = await User.find({ 
+      skills : {
+        $regex: new RegExp(skill, 'i')
+      },
+      mentor: true
+     })
       .select(
         "fname lname mentor profileImage category skills subCategory -_id"
       )
-      .exec();
+      .exec();    
     res.json(users);
   } catch (err) {
     res.status(500).send("Error fetching users");
